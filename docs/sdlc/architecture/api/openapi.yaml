@@ -2,6 +2,233 @@
 openapi: 3.1.0
 info:
   title: to do list
-  version: architecture-v0
+  version: architecture-v1
   description: Designed API from the approved architecture (not extracted from code).
-paths: {}
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate with email and password; on success create a server-side
+        session and return an opaque token in the body.
+      description: Authenticate with email and password; on success create a server-side
+        session and return an opaque token in the body.
+      operationId: post_auth_login
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{ email, password }'
+      responses:
+        '200':
+          description: '{ token, user: { id, email, timezone } }'
+  /auth/logout:
+    post:
+      summary: Revoke the current session so the token can no longer be used.
+      description: Revoke the current session so the token can no longer be used.
+      operationId: post_auth_logout
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: empty
+      responses:
+        '200':
+          description: 204 No Content
+      security:
+      - bearerAuth: []
+  /auth/me:
+    get:
+      summary: Return the signed-in owner's profile; used by the SPA to confirm an
+        active session and redirect to sign-in when absent.
+      description: Return the signed-in owner's profile; used by the SPA to confirm
+        an active session and redirect to sign-in when absent.
+      operationId: get_auth_me
+      parameters: []
+      responses:
+        '200':
+          description: '{ id, email, timezone }'
+      security:
+      - bearerAuth: []
+  /tasks:
+    get:
+      summary: List the owner's tasks, optionally filtered by status, ordered by position.
+      description: List the owner's tasks, optionally filtered by status, ordered
+        by position.
+      operationId: get_tasks
+      parameters: []
+      responses:
+        '200':
+          description: '[ { id, description, dueAt, isComplete, position } ]'
+      security:
+      - bearerAuth: []
+    post:
+      summary: Create a task with a required description and optional due date/time;
+        appended to the end of the list as outstanding.
+      description: Create a task with a required description and optional due date/time;
+        appended to the end of the list as outstanding.
+      operationId: post_tasks
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{ description, dueAt? }'
+      responses:
+        '200':
+          description: 201 { id, description, dueAt, isComplete, position }
+      security:
+      - bearerAuth: []
+  /tasks/:id:
+    patch:
+      summary: Edit a task's description and/or due date/time; rejects an empty description.
+      description: Edit a task's description and/or due date/time; rejects an empty
+        description.
+      operationId: patch_tasks_id
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{ description?, dueAt? }'
+      responses:
+        '200':
+          description: 200 { id, description, dueAt, isComplete, position }
+      security:
+      - bearerAuth: []
+    delete:
+      summary: Delete a task so it no longer appears in any view.
+      description: Delete a task so it no longer appears in any view.
+      operationId: delete_tasks_id
+      parameters: []
+      responses:
+        '200':
+          description: 204 No Content
+      security:
+      - bearerAuth: []
+  /tasks/:id/completion:
+    patch:
+      summary: Mark a task complete or reopen it.
+      description: Mark a task complete or reopen it.
+      operationId: patch_tasks_id_completion
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{ isComplete }'
+      responses:
+        '200':
+          description: 200 { id, isComplete }
+      security:
+      - bearerAuth: []
+  /tasks/reorder:
+    patch:
+      summary: Persist a new ordering of outstanding tasks from the drag-and-drop
+        interaction.
+      description: Persist a new ordering of outstanding tasks from the drag-and-drop
+        interaction.
+      operationId: patch_tasks_reorder
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{ orderedTaskIds: [uuid, ...] }'
+      responses:
+        '200':
+          description: 200 [ { id, position } ]
+      security:
+      - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    users:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        password_hash:
+          type: string
+        timezone:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - email
+      - password_hash
+      - timezone
+      - created_at
+    sessions:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        token_hash:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        last_active_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - token_hash
+      - expires_at
+      - last_active_at
+      - created_at
+    tasks:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        due_at:
+          type: string
+          format: date-time
+        is_complete:
+          type: boolean
+        position:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - description
+      - is_complete
+      - position
+      - created_at
+      - updated_at
