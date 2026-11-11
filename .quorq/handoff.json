@@ -1,0 +1,24 @@
+{
+  "emitted": {
+    ".devcontainer/devcontainer.json": "5b50c33a167fbd1d45962c6f44c7a53db35d8dbe",
+    "README.md": "6e0c7c4ec1e680f05168399de712c78cca9c9c3a",
+    "frontend/.gitignore": "6f9fce738bf78ff73bfdd267173071ff43cb43e6",
+    "frontend/.prettierrc": "e28abddce413b917d51826338a7af2dd711673b2",
+    "frontend/README.md": "1b1f9827df1eda4ed44c2b75d6d154d061ec9e6e",
+    "frontend/e2e/example.spec.ts": "23e48f77527acc8dea74d9088b1e61582219f3c4",
+    "frontend/e2e/support/admin.ts": "d12f00261a9e8f0af672e3253a158a1d380bf905",
+    "frontend/eslint.config.js": "9df5851bcc02a74f076ec4c7b6ddfc20591d3e89",
+    "frontend/index.html": "de7f74c4f11eb7c526ebe1d33afa3876b7ea2934",
+    "frontend/package.json": "b91d32741ad6cc780b212901207c4d1fdb695686",
+    "frontend/playwright.config.ts": "b9263bba935fa04b4a0a37f0ce99b1a6678f704f",
+    "frontend/src/index.css": "56cb20119bc4c326c56adb3cd8b5b0713b646a64",
+    "frontend/src/lib/api.ts": "3cb54c298a91ccb2240c210543bf5cf201cc6ab6",
+    "frontend/src/lib/icons.tsx": "f82b7d8620acb9970fb72a6b246832872ef328fe",
+    "frontend/src/lib/navigate.ts": "d6651981d1aea4ca7a3e8a684ff771d34f2497c0",
+    "frontend/src/lib/ui.tsx": "0928e79dece300ed46071466f760ab0eca9dca77",
+    "frontend/src/main.tsx": "15ac88aeae742be03e78cf29d010a01df53d6469",
+    "frontend/src/test-setup.ts": "5931a6023348d87788f085f9c9f3498cd2e6ef98",
+    "frontend/tsconfig.json": "b9f44c2af3137e821c77e2b6f2e7f2e9f416da27",
+    "frontend/vite.config.ts": "7cb82db6bc8c573e31eafb4df9034a80546cd9ab"
+  }
+}

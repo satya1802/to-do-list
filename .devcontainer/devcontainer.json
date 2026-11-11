@@ -1,0 +1,8 @@
+{
+  "name": "to do list",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "forwardPorts": [
+    5173
+  ],
+  "postCreateCommand": "cd frontend && npm install --no-audit --no-fund && npx playwright install --with-deps chromium"
+}
