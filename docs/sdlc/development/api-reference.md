@@ -21,5 +21,5 @@ _No routes found._
 <!-- sdlc:auto:end drift -->
 
 <!-- sdlc:auto:start source -->
-_Not generated yet._
+Generated from commit `002314f`
 <!-- sdlc:auto:end source -->

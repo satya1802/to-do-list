@@ -23,7 +23,7 @@ to do list
 | [API (OpenAPI)](architecture/api/openapi.yaml) | generated |
 | [Decisions (ADRs)](architecture/adr/README.md) | 4 decisions |
 | [Sprint plan](development/sprint-plan.md) | not generated yet |
-| [Developer guide](development/developer-guide.md) | not generated yet |
+| [Developer guide](development/developer-guide.md) | generated |
 | [API reference](development/api-reference.md) | 0 routes |
 | [Test report](testing/test-report.md) | not run yet |
 | [Tests](testing/test-cases.md) | 0 tests |
