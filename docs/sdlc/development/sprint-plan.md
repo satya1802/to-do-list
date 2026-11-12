@@ -29,9 +29,10 @@ Capacity: 20 points · Committed: 19
 |---|---|---|---|---|---|
 | US-004 | Story | Add a task to the list | 8 | backend-agent | — |
 | ↳ US-004-T1 | Task | Add tasks table migration | — | backend-agent | — |
-| ↳ US-004-T2 | Task | Implement POST /tasks and GET /tasks endpoints | — | backend-agent | — |
+| ↳ US-004-T2 | Task | Implement POST /tasks endpoint | — | backend-agent | — |
 | ↳ US-004-T3 | Task | Build Angular task list view and add-task form | — | frontend-agent | — |
 | ↳ US-004-T4 | Task | Write test suite for add-task validation and listing | — | qa-agent | — |
+| ↳ PIPER-eda6db0b | Task | Implement GET /tasks endpoint | — | backend-agent | — |
 | US-005 | Story | Set a due date and time on a task | 3 | frontend-agent | US-004 |
 | US-006 | Story | Edit a task | 3 | backend-agent | US-004 |
 | US-007 | Story | Mark a task complete | 3 | backend-agent | US-004 |
@@ -41,11 +42,20 @@ Capacity: 20 points · Committed: 19
 
 Reordering, outstanding/completed views, and responsive layout
 
-Capacity: 20 points · Committed: 13
+Capacity: 20 points · Committed: 5
 
 | Key | Type | Title | Points | Role | Depends on |
 |---|---|---|---|---|---|
 | US-009 | Story | Reorder tasks in the list | 5 | frontend-agent | US-004 |
+
+## Sprint 4: Sprint 4
+
+Epic-003: Viewing and tracking task progress
+
+Capacity: 20 points · Committed: 8
+
+| Key | Type | Title | Points | Role | Depends on |
+|---|---|---|---|---|---|
 | US-010 | Story | View outstanding versus completed tasks | 3 | frontend-agent | US-004, US-007 |
 | US-011 | Story | Use the app on phone and desktop | 5 | frontend-agent | US-004, US-009, US-010 |
 

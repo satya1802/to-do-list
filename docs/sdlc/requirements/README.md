@@ -5,199 +5,71 @@
 <!-- sdlc:auto:start narrative -->
 ## Summary
 
-### REQ-STACK · approved · source: requirements:technology-stack
+### REQ-TECHSTACK · approved · source: requirements:v2
 
-Product owner approved an exact technology stack for this build; no substitutions allowed.
+Technology stack approved by the product owner: NestJS 11 backend, Angular 22 frontend, PostgreSQL 16 database, hosted on AWS.
 
-Approved stack: Backend NestJS 11; Cloud AWS (smallest/low-cost tier, room to scale); Database PostgreSQL 16 (relational fit for tasks with due dates/done flag/single user, supports efficient 'due soon' queries); Frontend Angular 22.
+Backend: NestJS 11. Frontend: Angular 22. Database: PostgreSQL 16 -- chosen because the app's data (tasks with due date, done flag, one user account) is structured, date-driven data suited to a relational database, and it lets the app efficiently query 'which tasks are due soon' for timely reminders; more than sufficient for a single user. Cloud: AWS -- comfortably runs the small web app, its database, and a scheduled reminder job on modest, low-cost resources; app is free and single-user so smallest tier is used, with room to scale later. Product owner directive: design against exactly this stack, do not substitute.
 
-### REQ-SERVICES · approved · source: requirements:services
+### REQ-SERVICES · approved · source: requirements:v2
 
-One runtime service approved: a Redis queue, intended to hold reminders until due time.
+One runtime service approved: a Redis-backed delayed job queue to fire due-date reminders at the right time.
 
-Queue: Redis (as a queue), container redis:7-alpine. Rationale given: a reminder must fire at a specific time ahead of a task's due time; a delayed-job queue holds the reminder and triggers it, which a plain web request cannot do alone. Required API key/env var: REDIS_URL. Note: despite this rationale, actual reminder delivery (email/push/SMS) is explicitly out of scope in this version per EPIC-002 assumptions -- due date/time is recorded and displayed only, no reminder message is sent.
+Queue: Redis (as a queue), container redis:7-alpine. Rationale: a reminder must fire at a specific time ahead of each task's due time; a delayed-job queue holds each reminder until the moment it should send and triggers it, which a plain web request cannot do on its own. Required API key/env var: REDIS_URL.
 
-**Related:** US-005
+### REQ-SCOPE · approved · source: requirements:v2
 
-### REQ-OUT-OF-SCOPE · approved · source: requirements:out-of-scope
+Scope is a lightweight, single-user web to-do list with due-date reminders; native mobile apps, push/SMS reminders, and email are explicitly excluded.
 
-Explicit exclusions for this delivery.
+Delivery scope: lightweight. Out of scope -- do not design or build: (1) Native mobile app (iOS/Android); (2) Mobile push notifications and SMS reminders; (3) Email (the previously suggested SendGrid was removed from the stack). Note: email delivery is out of scope even though the Redis queue exists to time reminders -- the input does not state what channel reminders ultimately use, so this is flagged rather than assumed.
 
-Out of scope: native mobile app (iOS/Android); mobile push notifications and SMS reminders; email (SendGrid was removed from the stack). Delivery scope flagged as 'lightweight'; requirements version 1.
+### REQ-FEAT-AUTH · approved · source: requirements:v2
 
-### EPIC-001 · draft · source: requirements:EPIC-001
+Single-user sign-in using email and password.
 
-Secure single-user access: the to-do list is private to one individual, protected by email + password sign-in, with no public sign-up.
+Capability: Single-user email and password sign-in. Supports exactly one user account per the database rationale (one user account is part of the app's structured data).
 
-Single account is provisioned for the owner only; no multi-user onboarding. Sessions are protected and can be ended by signing out. Assumptions: single-user login protects the list with no public self-service sign-up flow in this version; app is free with no payment, billing, or subscription features.
+### REQ-FEAT-TASKMGMT · approved · source: requirements:v2
 
-**Related:** US-001, US-002, US-003
+Core task CRUD: create, edit, and delete tasks on the list.
 
-### US-001 · draft · source: requirements:US-001
+Capabilities: Add a task to the list; Edit a task; Delete a task.
 
-Critical story: owner signs in with email and password to reach their private task list.
+### REQ-FEAT-DUEDATE · approved · source: requirements:v2
 
-AC-001: correct email+password on sign-in page -> signed in, taken to task list. AC-002: email/password that doesn't match account -> not signed in, invalid-credentials error shown. AC-003: stored credentials are persisted only as a hash, never in plain text.
+Tasks carry a due date and time, displayed in the individual's own time zone.
 
-**Related:** EPIC-001, AC-001, AC-002, AC-003, NFR-001, NFR-004
+Capabilities: Set a due date and time on a task; Due dates shown in the individual's own time zone. Due date/time is the field the Redis-backed reminder queue schedules against.
 
-### US-002 · draft · source: requirements:US-002
+### REQ-FEAT-STATUS · approved · source: requirements:v2
 
-High-priority story: session stays protected and owner can sign out, so an unattended device doesn't expose tasks.
+Tasks can be marked complete, and the list can be viewed split by outstanding versus completed status.
 
-AC-004: not signed in and trying to open task list -> redirected to sign-in page, no tasks visible. AC-005: signing out ends session, must sign in again to view tasks. AC-006: session inactive beyond expiry -> session expires, sign-in required again.
+Capabilities: Mark a task complete; View outstanding versus completed tasks.
 
-**Related:** EPIC-001, AC-004, AC-005, AC-006, NFR-002, NFR-003, NFR-004
+### REQ-FEAT-ORDER · approved · source: requirements:v2
 
-### US-003 · draft · source: requirements:US-003
+Tasks can be manually reordered within the list.
 
-Low-priority story: the whole app is usable free of charge with no paywall.
+Capability: Reorder tasks in the list.
 
-AC-007: while signed in, using any feature never prompts payment, billing details, or subscription, and no feature is locked behind a paywall.
+### REQ-FEAT-STRUCTURE · approved · source: requirements:v2
 
-**Related:** EPIC-001, AC-007, NFR-007
+The task list is a single flat list with no categories or subtasks.
 
-### EPIC-002 · draft · source: requirements:EPIC-002
+Capability: Single flat task list (no categories or subtasks) -- explicitly constrains the data model and UI to avoid hierarchical or grouped task structures.
 
-Managing tasks: owner maintains a single flat list -- add, edit, complete, delete, reorder, and optionally set a due date/time.
+### REQ-NFR-FREE · approved · source: requirements:v2
 
-No categories, priorities, notes, or subtasks in this version. Assumptions: single flat list with no categories/priority/subtasks; due dates interpreted in owner's own time zone; time-based reminders before due time are NOT delivered in this version (email/push/SMS all out of scope) -- due date/time is recorded and displayed only, no reminder is sent.
+The application is free to use with no payment or subscription model.
 
-**Related:** US-004, US-005, US-006, US-007, US-008, US-009
-
-### US-004 · draft · source: requirements:US-004
-
-Critical story: owner adds a new task to capture something to do.
-
-AC-008: entering a description and saving -> task appears in list as outstanding. AC-009: trying to save with empty description -> not saved, owner told description is required.
-
-**Related:** EPIC-002, AC-008, AC-009
-
-### US-005 · draft · source: requirements:US-005
-
-High-priority story: owner can set a due date and time on a task so they know when it needs to be done.
-
-AC-010: setting due date/time on add or edit and saving -> task shows that due date/time. AC-011: due date/time is shown in the owner's own time zone. AC-012: saving without a due date/time -> task saved with no due date and still appears in the list.
-
-**Related:** EPIC-002, AC-010, AC-011, AC-012, NFR-006
-
-### US-006 · draft · source: requirements:US-006
-
-High-priority story: owner edits a task's description or due date to keep the list accurate.
-
-AC-013: editing description or due date/time and saving -> task shows updated details. AC-014: clearing description and trying to save -> change rejected, description-required message shown.
-
-**Related:** EPIC-002, AC-013, AC-014
-
-### US-007 · draft · source: requirements:US-007
-
-Critical story: owner marks a task complete (and can reopen it) to track what's finished.
-
-AC-015: marking an outstanding task complete -> shown as completed, removed from outstanding view. AC-016: marking a completed task not-complete -> returns to outstanding tasks.
-
-**Related:** EPIC-002, AC-015, AC-016
-
-### US-008 · draft · source: requirements:US-008
-
-Medium-priority story: owner deletes a task to keep the list free of unneeded items.
-
-AC-017: deleting a task removes it so it no longer appears in outstanding or completed views.
-
-**Related:** EPIC-002, AC-017
-
-### US-009 · draft · source: requirements:US-009
-
-Medium-priority story: owner reorders tasks in the list to work through them in a preferred order.
-
-AC-018: moving a task to a new position among several outstanding tasks keeps it there, and the new order persists on return to the list.
-
-**Related:** EPIC-002, AC-018
-
-### EPIC-003 · draft · source: requirements:EPIC-003
-
-Viewing and tracking task progress: see outstanding vs. completed tasks, usable comfortably on phone or desktop.
-
-Assumptions: delivered as a mobile-friendly responsive web app, not a native mobile app; all dates/times shown in owner's own time zone.
-
-**Related:** US-010, US-011
-
-### US-010 · draft · source: requirements:US-010
-
-High-priority story: owner sees outstanding tasks separately from completed ones.
-
-AC-019: viewing outstanding tasks shows only tasks not yet complete. AC-020: viewing completed tasks shows only tasks marked complete.
-
-**Related:** EPIC-003, AC-019, AC-020, NFR-006
-
-### US-011 · draft · source: requirements:US-011
-
-Medium-priority story: app adapts to screen size for comfortable use on phone or computer.
-
-AC-021: on a small mobile screen, layout fits and add/edit/complete/delete/reorder all work without horizontal scrolling. AC-022: on a large desktop screen, layout adapts to the wider screen with all the same actions available.
-
-**Related:** EPIC-003, AC-021, AC-022, NFR-005
-
-### NFR-001 · draft · source: requirements:NFR-001
-
-Security: account password must be stored only as a hash, never plain text.
-
-Applies to US-001. Ensures stored credentials cannot be read back.
-
-**Related:** US-001
-
-### NFR-002 · draft · source: requirements:NFR-002
-
-Security: sessions must end on sign-out and expire after inactivity.
-
-Applies to US-002. After expiry or sign-out, owner must sign in again before seeing any tasks.
-
-**Related:** US-002
-
-### NFR-003 · draft · source: requirements:NFR-003
-
-Security: unauthenticated access to the task list must be blocked.
-
-Applies to US-002. Anyone not signed in trying to open the task list is sent to the sign-in page and sees no tasks.
-
-**Related:** US-002
-
-### NFR-004 · draft · source: requirements:NFR-004
-
-Privacy: the task list is private to the single owner.
-
-Applies to US-001, US-002. Only the signed-in owner can view or manage their tasks.
-
-**Related:** US-001, US-002
-
-### NFR-005 · draft · source: requirements:NFR-005
-
-Usability: app must adapt layout to screen size for phone and desktop use.
-
-Applies to US-011. Add, edit, complete, delete, and reorder must work on small mobile screens without horizontal scrolling, and the same actions must be available on wide desktop screens.
-
-**Related:** US-011
-
-### NFR-006 · draft · source: requirements:NFR-006
-
-Usability: all due dates and times must be shown in the owner's own time zone.
-
-Applies to US-005, US-010.
-
-**Related:** US-005, US-010
-
-### NFR-007 · draft · source: requirements:NFR-007
-
-Compliance: every feature must be usable free of charge, with no paywall.
-
-Applies to US-003. Owner is never asked to pay, enter billing details, or subscribe; no feature is locked behind a paywall.
-
-**Related:** US-003
+Non-functional/business constraint: Free to use, with no payment or subscription. Reinforced by the AWS stack rationale noting the app serves one person for free and should run on minimal-cost resources.
 <!-- sdlc:auto:end narrative -->
 
 <!-- sdlc:auto:start summary -->
-**Requirements version:** v1  
+**Requirements version:** v2  
 **Delivery scope:** lightweight  
-**Approved:** 2026-11-11
+**Approved:** 2026-11-12
 
 **Capabilities in scope:** Single-user email and password sign-in, Add a task to the list, Set a due date and time on a task, Mark a task complete, Edit a task, Delete a task, Reorder tasks in the list, View outstanding versus completed tasks, Single flat task list (no categories or subtasks), Due dates shown in the individual's own time zone, Free to use, with no payment or subscription
 
@@ -215,18 +87,6 @@ Applies to US-003. Owner is never asked to pay, enter billing details, or subscr
 ## EPIC-001: Secure single-user access
 
 The to-do list is private to one individual and is protected behind an email + password sign-in. There is no public sign-up or multi-user onboarding; the single account is provisioned for the owner. Sessions are protected and can be ended by signing out. ASSUMPTION: a single-user login protects the list and no public self-service sign-up flow exists in this version. ASSUMPTION: the app is free of charge with no payment, billing or subscription features.
-
-### US-001: Sign in with email and password
-
-**Priority:** critical
-
-> As a the task list owner, I want to sign in with my email address and password, so that only I can view and manage my private task list.
-
-| ID | Given | When | Then |
-|---|---|---|---|
-| AC-001 | I am on the sign-in page and an account exists for my email | I enter my correct email and password and submit | I am signed in and taken to my task list |
-| AC-002 | I am on the sign-in page | I enter an email or password that does not match the account | I am not signed in and I see an error that the credentials are not valid |
-| AC-003 | the system stores my account credentials | my password is persisted | it is stored only as a hash and never in plain text |
 
 ### US-002: Keep my list private across sessions
 
